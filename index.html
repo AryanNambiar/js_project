@@ -1,0 +1,139 @@
+<html>
+<head>
+  <title></title>
+  <script type="text/javascript" src="sudooku.js"></script>
+  <script type="text/javascript" src="analytics.js"></script>
+  <style type="text/css">
+
+    body { font-family: Calibri, sans-serif; background-image:url(o7HGhT.webp); background-size:cover; background-repeat: no-repeat; background-position: center center;}
+    #container { text-align: center }
+    table { border-collapse: collapse; font-size: 2em; margin: 0 auto; }
+    colgroup, tbody { border: solid medium; }
+    td { border: solid ;  height: 1.4em; width: 1.4em; text-align: center; padding: 0; }
+    button { margin-top: 15px; font-size: 1.5em; margin-right:10px;}
+    
+    .padd{ font-style:italic; color:black; text-align: center;}
+
+    .marginer{
+      margin-right:10px;
+    }
+    
+    p{
+      
+      font-size:20px;
+      text-align: center;
+    }
+    span{
+      font-weight:bold;
+    }
+    .image{
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 20%;
+    }
+    .bruhma{
+      width:100%;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="bruhma">
+    <h1 class = "padd">Sudoku Solver</h1>
+    <img class="image" src="backtracking_mech.gif">
+<p> Sudoku is a popular number puzzle game that typically consists of a 9x9 grid divided into nine 3x3 subgrids or regions. The objective of Sudoku is to fill every empty cell in the grid with a digit from 1 to 9, ensuring that <span>each row, each column, and each 3x3 subgrid contains all the digits from 1 to 9 without any repetition.</span></p>
+<p>Did you know that the total number of possible Sudoku grids have been calculated to be approximately <span>6.67 x 10^21</span> 🤯, which is more than the total number of atoms in the observable universe!</p>
+<p>In order to make use of this 9x9 Sudoku Solver enter the known numbers in the appropriate cells (Pro Tip: Enter atleast 17 numbers to get a unique solution) and click on the Solve! button to get the answer. The Clear Board button will set the board to its initial stage.</p>
+  </div>  
+
+
+  <div id="container">
+
+    
+
+    <table id="sudoku-board">
+      
+      
+      <colgroup><col><col><col>
+      <colgroup><col><col><col>
+      <colgroup><col><col><col>
+      <tbody>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>     
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+      <tbody>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>     
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+      <tbody>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>     
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+    </table>
+    <div>
+      <button id="solve-button">Solve!</button> <button id="clear-button">Clear board</button>
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript">
+  document.getElementById("sudoku-board").addEventListener("keyup", function(event) {
+    if(event.target && event.target.nodeName == "TD") {
+      var validNum = /[1-9]/;
+      var tdEl = event.target;
+      if (tdEl.innerText.length > 0 && validNum.test(tdEl.innerText[0])) {
+        tdEl.innerText = tdEl.innerText[0];
+      } else {
+        tdEl.innerText = "";
+      }
+    }
+  });
+
+  document.getElementById("solve-button").addEventListener("click", function(event) {
+    var boardString = boardToString();
+    var solution = SudokuSolver.solve(boardString);
+    if (solution) {
+      stringToBoard(solution);
+    } else {
+      alert("Invalid board!");
+    }
+  })
+
+  document.getElementById("clear-button").addEventListener("click", clearBoard);
+
+  function clearBoard() {
+    var tds = document.getElementsByTagName("td");
+    for (var i = 0; i < tds.length; i++) {
+      tds[i].innerText = "";
+    }
+  }
+
+  function boardToString() {
+    var string = "";
+    var validNum = /[1-9]/;
+    var tds = document.getElementsByTagName("td");
+    for (var i = 0; i < tds.length; i++) {
+      if (validNum.test(tds[i].innerText[0])) {
+        string += tds[i].innerText;
+      } else {
+        string += "-";
+      }
+    }
+    return string;
+  }
+
+  function stringToBoard(string) {
+    var currentCell;
+    var validNum = /[1-9]/;
+    var cells = string.split("");
+    var tds = document.getElementsByTagName("td");
+    for (var i = 0; i < tds.length; i++) {
+      currentCell = cells.shift();
+      if (validNum.test(currentCell)) {
+        tds[i].innerText = currentCell;
+      }
+    }
+  }
+</script>
+</html>
